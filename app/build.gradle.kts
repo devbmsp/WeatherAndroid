@@ -40,7 +40,7 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
+        kotlinCompilerExtensionVersion = "1.5.1"  // Verifique se é compatível
     }
     packaging {
         resources {
@@ -50,7 +50,6 @@ android {
 }
 
 dependencies {
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -59,8 +58,15 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+
     implementation(libs.androidx.room.common)
-    implementation(libs.androidx.room.common.jvm)
+    implementation ("com.squareup.retrofit2:retrofit:2.6.2")
+    implementation ("com.squareup.retrofit:converter-gson:2.0.0-beta2")
+    implementation("com.google.android.material:material:1.9.0")
+
+    implementation("com.google.android.gms:play-services-location:17.0.0")
+    implementation("com.karumi:dexter:6.0.1")
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
