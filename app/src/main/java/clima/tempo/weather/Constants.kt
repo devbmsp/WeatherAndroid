@@ -11,7 +11,6 @@ import android.os.Build
         const val BASE_URL: String = "http://api.openweathermap.org/data/"
         const val METRIC_UNIT: String = "metric"
 
-
         const val PREFERENCE_NAME = "WeatherAppPreference"
         const val WEATHER_RESPONSE_DATA = "weather_response_data"
 
