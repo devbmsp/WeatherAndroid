@@ -14,8 +14,8 @@
     <dimen name="identification_image_marginEnd">10dp</dimen>
     <dimen name="label_text_size">18sp</dimen>
     <dimen name="value_text_size">16sp</dimen>
-    <dimen name="sunset_marginStart">10dp</dimen>
-    <dimen name="sunrise_marginTop">10dp</dimen>
+    <dimen name="sunset_marginStart">4dp</dimen>
+    <dimen name="sunrise_marginTop">100dp</dimen>
     <dimen name="divider_height">1dp</dimen>
     <dimen name="divider_margin">16dp</dimen>
 </resources>
