@@ -19,6 +19,8 @@ import android.location.Location
 import android.net.Uri
 import android.os.Looper
 import android.util.Log
+import android.widget.EditText
+import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import clima.tempo.weather.Models.WeatherResponse
 import clima.tempo.weather.Network.WeatherServices
@@ -29,10 +31,10 @@ import retrofit.Callback
 import retrofit.GsonConverterFactory
 import retrofit.Response
 import retrofit.*
+import java.text.SimpleDateFormat
 import java.util.*
 
 class MainActivity : ComponentActivity() {
-
     private lateinit var mFusedLocationClient: FusedLocationProviderClient
     private var mProgressDialog: Dialog? = null
 
@@ -209,9 +211,30 @@ class MainActivity : ComponentActivity() {
     private fun setupUI(weatherList: WeatherResponse){
         for(i in weatherList.weather.indices){
             Log.i("Weather Name", weatherList.weather.toString())
+            val tv_main = findViewById<TextView>(R.id.tv_main)
+            val tv_main_description = findViewById<TextView>(R.id.tv_main_description)
+            val tv_temp = findViewById<TextView>(R.id.tv_temp)
+            val tv_sunrise_time = findViewById<TextView>(R.id.tv_sunrise_time)
+            val tv_sunset_time = findViewById<TextView>(R.id.tv_sunset_time)
+            val tv_humidity = findViewById<TextView>(R.id.tv_humidity)
+            val tv_min = findViewById<TextView>(R.id.tv_min)
+            val tv_max = findViewById<TextView>(R.id.tv_max)
+            val tv_speed = findViewById<TextView>(R.id.tv_speed)
+            val tv_name = findViewById<TextView>(R.id.tv_name)
+            val tv_country = findViewById<TextView>(R.id.tv_country)
+
+
             tv_main.text = weatherList.weather[i].main
             tv_main_description.text = weatherList.weather[i].description
             tv_temp.text = weatherList.main.temp.toString() + getUnit(application.resources.configuration.locales.toString())
+            tv_sunrise_time.text = unixTime(weatherList.sys.sunrise.toLong())
+            tv_sunset_time.text = unixTime(weatherList.sys.sunset.toLong())
+            tv_humidity.text = weatherList.main.humidity.toString() + " per cent"
+            tv_min.text = weatherList.main.tempMin.toString() + " min"
+            tv_max.text = weatherList.main.tempMax.toString() + " max"
+            tv_speed.text = weatherList.wind.speed.toString()
+            tv_name.text = weatherList.name
+            tv_country.text = weatherList.sys.country
             // Não tá importando os dados da activity_main.xml, não sei o pq.
         }
     }
@@ -221,6 +244,13 @@ class MainActivity : ComponentActivity() {
             value = "°F"
         }
         return value
+    }
+    private fun unixTime(timex: Long): String? {
+        val date = Date(timex * 1000L)
+        @SuppressLint("SimpleDateFormat") val sdf =
+            SimpleDateFormat("HH:mm")
+        sdf.timeZone = TimeZone.getDefault()
+        return sdf.format(date)
     }
 }
 
