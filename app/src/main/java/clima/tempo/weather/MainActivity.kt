@@ -1,5 +1,4 @@
 package clima.tempo.weather
-
 import android.content.Intent
 import android.location.LocationManager
 import android.os.Bundle
@@ -33,6 +32,11 @@ import retrofit.Response
 import retrofit.*
 import java.text.SimpleDateFormat
 import java.util.*
+import android.widget.ImageView
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat.getSystemService
+import androidx.core.content.ContextCompat.startActivity
+import androidx.core.location.LocationManagerCompat.isLocationEnabled
 
 class MainActivity : ComponentActivity() {
     private lateinit var mFusedLocationClient: FusedLocationProviderClient
@@ -104,7 +108,6 @@ class MainActivity : ComponentActivity() {
             Looper.myLooper()
         )
     }
-
     private val mLocationCallback = object : LocationCallback() {
         override fun onLocationResult(locationResult: LocationResult) {
 
@@ -236,7 +239,8 @@ class MainActivity : ComponentActivity() {
             tv_name.text = weatherList.name
             tv_country.text = weatherList.sys.country
             // Não tá importando os dados da activity_main.xml, não sei o pq.
-
+            
+            val iv_main: ImageView = findViewById(R.id.iv_main)
             when(weatherList.weather[i].icon){
                 "01d" -> iv_main.setImageResource(R.drawable.sunny)
                 "02d" -> iv_main.setImageResource(R.drawable.cloud)
