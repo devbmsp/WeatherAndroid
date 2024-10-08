@@ -3,4 +3,5 @@
     <string name="aguarde">Aguarde&#8230;</string>
     <string name="DescImagem">Imagem</string>
     <string name="km_hora">Km/H</string>
+    <string name="action_refresh">Refresh</string>
 </resources>
