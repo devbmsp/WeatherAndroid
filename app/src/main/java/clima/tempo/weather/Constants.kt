@@ -7,8 +7,8 @@ import android.os.Build
 
     object Constants {
 
-        const val APP_ID: String = "2c50325f427689340a03ff16215d8fc4"
-        const val BASE_URL: String = "http://api.openweathermap.org/data/"
+        const val APP_ID: String = "d285e3db26867152cb3877abd3fa1ee5"
+        const val BASE_URL: String = "https://api.openweathermap.org/data/"
         const val METRIC_UNIT: String = "metric"
 
         const val PREFERENCE_NAME = "WeatherAppPreference"

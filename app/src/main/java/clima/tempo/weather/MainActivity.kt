@@ -132,12 +132,14 @@ class MainActivity : ComponentActivity() {
                 retrofit.create(WeatherServices::class.java)
 
             val listCall: Call<WeatherResponse> = service.getWeather(
-                latitude, longitude, Constants.METRIC_UNIT, Constants.APP_ID
+                latitude, longitude, Constants.APP_ID, Constants.METRIC_UNIT
             )
             showCustomProgressDialog()
 
             listCall.enqueue(object : Callback<WeatherResponse>{
                 override fun onResponse(response: Response<WeatherResponse>?, retrofit: Retrofit?) {
+                    val requestUrl = response?.raw()?.request()?.urlString() // Obter a URL completa
+                    Log.d("URL Used", "URL da requisição: $requestUrl")
                     if(response!!.isSuccess){
                         hideProgressDialog()
                         val weatherList: WeatherResponse = response.body()
@@ -241,19 +243,20 @@ class MainActivity : ComponentActivity() {
             val tv_min = findViewById<TextView>(R.id.tv_min)
             val tv_max = findViewById<TextView>(R.id.tv_max)
             val tv_speed = findViewById<TextView>(R.id.tv_speed)
+            val tv_speed_unit = findViewById<TextView>(R.id.tv_speed_unit)
             val tv_name = findViewById<TextView>(R.id.tv_name)
             val tv_country = findViewById<TextView>(R.id.tv_country)
 
-
             tv_main.text = weatherList.weather[i].main
             tv_main_description.text = weatherList.weather[i].description
-            tv_temp.text = weatherList.main.temp.toString() + getUnit(application.resources.configuration.locales.toString())
+            tv_temp.text = "Temperatura: " + weatherList.main.temp.toString() + getUnit(application.resources.configuration.locales.toString())
             tv_sunrise_time.text = unixTime(weatherList.sys.sunrise.toLong())
             tv_sunset_time.text = unixTime(weatherList.sys.sunset.toLong())
             tv_humidity.text = weatherList.main.humidity.toString() + " per cent"
-            tv_min.text = weatherList.main.tempMin.toString() + " min"
-            tv_max.text = weatherList.main.tempMax.toString() + " max"
-            tv_speed.text = weatherList.wind.speed.toString()
+            tv_min.text = weatherList.main.temp_min.toString() + " min"
+            tv_max.text = weatherList.main.temp_max.toString() + " max"
+            tv_speed.text = "Velocidade do vento:"
+            tv_speed_unit.text = weatherList.wind.speed.toString() + "Km/H"
             tv_name.text = weatherList.name
             tv_country.text = weatherList.sys.country
             // Não tá importando os dados da activity_main.xml, não sei o pq.

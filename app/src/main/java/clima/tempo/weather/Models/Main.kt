@@ -3,9 +3,9 @@ package clima.tempo.weather.Models
 import java.io.Serializable
 
 data class Main(
-    val temp: Int,
+    val temp: Double,
     val pressure: Int,
     val humidity: Int,
-    val tempMin: Int,
-    val tempMax: Int
+    val temp_min: Double,
+    val temp_max: Double
 ) : Serializable
