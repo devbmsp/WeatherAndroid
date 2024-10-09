@@ -271,7 +271,7 @@ class MainActivity : ComponentActivity() {
                 tv_speed_unit.text = weatherList.wind.speed.toString() + "Km/H"
                 tv_name.text = weatherList.name
                 tv_country.text = weatherList.sys.country
-                // Não tá importando os dados da activity_main.xml, não sei o pq.
+                // Não tá importando os dados da activity_main.xml
 
                 val iv_main: ImageView = findViewById(R.id.iv_main)
                 when(weatherList.weather[i].icon){

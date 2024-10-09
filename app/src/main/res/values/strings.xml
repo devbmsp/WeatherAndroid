@@ -4,4 +4,10 @@
     <string name="DescImagem">Imagem</string>
     <string name="km_hora">Km/H</string>
     <string name="action_refresh">Refresh</string>
+    <string name="cadastrar">Cadastrar</string>
+    <string name="senha">Senha</string>
+    <string name="possuoCadastro">Já tenho cadastro</string>
+    <string name="e_mail">E-mail</string>
+    <string name="nome">Nome</string>
+    <string name="login">Login</string>
 </resources>
