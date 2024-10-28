@@ -2,8 +2,26 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:gravity="center"
     android:orientation="vertical"
     android:padding="16dp">
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="104dp" />
+
+    <TextView
+        android:id="@+id/textLogin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="Bem Vindo ao WeatherApp!"
+        android:textColorLink="@color/black"
+        android:textSize="34sp" />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="107dp" />
 
     <EditText
         android:id="@+id/et_email"
@@ -21,7 +39,19 @@
 
     <Button
         android:id="@+id/btn_login"
+        style="@style/Widget.AppCompat.Button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/login" />
+        android:layout_gravity="center"
+        android:text="@string/login"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textColorLink="#009688" />
+
+    <Button
+        android:id="@+id/btn_cadastro"
+        style="@style/Widget.AppCompat.Button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/semCadastro" />
+
 </LinearLayout>

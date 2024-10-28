@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="16dp"
+    tools:context=".activities.LoginActivity">
 
     <EditText
         android:id="@+id/et_name"
@@ -27,13 +29,11 @@
 
     <Button
         android:id="@+id/btn_register"
+        style="@style/Widget.AppCompat.Button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center|center_horizontal"
         android:text="@string/cadastrar" />
 
-    <Button
-        android:id="@+id/btn_go_to_login"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/possuoCadastro" />
 </LinearLayout>

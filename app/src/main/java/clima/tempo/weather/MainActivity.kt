@@ -96,7 +96,7 @@ class MainActivity : ComponentActivity() {
                             ).show()
 
                         }
-
+                        setupUI()
                     }
 
                         override fun onPermissionRationaleShouldBeShown(
@@ -210,7 +210,7 @@ class MainActivity : ComponentActivity() {
                         val editor = mSharedPreferences.edit()
                         editor.putString(Constants.WEATHER_RESPONSE_DATA, weatherResponseJsonString)
                         editor.apply()
-                        setupUI()
+
                     }else{
                         val rc = response.code()
                         when(rc){
