@@ -15,3 +15,10 @@ class LoginViewModel(private val repository: UserRepository) : ViewModel() {
         }
     }
 }
+
+class UserRepository {
+    fun login(email: String, password: String): Any {
+            TODO("Not yet implemented")
+    }
+
+}

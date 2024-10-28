@@ -41,6 +41,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.core.content.ContextCompat.startActivity
 import androidx.core.location.LocationManagerCompat.isLocationEnabled
+import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.auth
+import com.google.firebase.database.database
+import com.google.firebase.firestore.FirebaseFirestore
 
 class MainActivity : ComponentActivity() {
     private lateinit var mFusedLocationClient: FusedLocationProviderClient
@@ -50,6 +55,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         mSharedPreferences = getSharedPreferences(Constants.PREFERENCE_NAME, Context.MODE_PRIVATE)
@@ -123,7 +129,59 @@ class MainActivity : ComponentActivity() {
             Log.e("Current Latitude", "$mLatitude")
             val mLongitude = mLastLocation.longitude
             Log.e("Current Longitude", "$mLongitude")
-            getLocationWeatherDetails(mLatitude,mLongitude)
+            getLocationWeatherDetails(mLatitude, mLongitude)
+
+            val auth = FirebaseAuth.getInstance()
+
+            //auth.createUserWithEmailAndPassword("brunomatheuspires@hotmail.com","123445")
+            /* auth.signInWithEmailAndPassword("brunomatheuspires@hotmail.com","123445").addOnCompleteListener{ autenticacao ->
+                         if (autenticacao.isSuccessful){
+                               val usuarioAtual = auth.currentUser
+                               val emailUsuario = usuarioAtual?.email
+
+                               if (emailUsuario != null) {
+                                   // Utilize o email do usuário conforme necessário
+                                   Log.d("FirebaseAuth", "Email do usuário: $emailUsuario")
+                               } else {
+                                   Log.d("FirebaseAuth", "O usuário não possui um email associado.")
+                               }
+
+                              // OU FAÇA COM O BD PARA PUXAR POR NICK
+                              //PARA ESCREVER NO BD
+
+                              val db = FirebaseFirestore.getInstance()
+                              // passe o username (imagine que apertou o botão de cadastrar e teve que registrar)
+                              val userMap = hashMapOf(
+                                  "nickName" to "bruno",
+                                  "email" to "brunomatheuspires@hotmail.com",
+                                  "senha" to "123445"
+                              )
+                              db.collection("Usuários").document("bruno")
+                                  .set(userMap).addOnCompleteListener{
+                                      Log.d("db", "success BD")
+                                  }
+                              //ler o bd :
+                              db.collection("Usuários").document("bruno2")
+                                  .addSnapshotListener{documento,error ->
+                                      print(documento?.getString("nickName"))
+
+
+                                  }
+             }
+            }
+            */
+
+
+
+           // override fun onStart() {
+             //   Super.onStart()
+               // val userAtual= FirebaseAuth.getInstance().currentUser
+                //if (userAtual == null) {
+                  //  telaPrincipal()
+                //}
+            //}
+
+            //quando clicar deslogar vai executar :     FirebaseAuth.getInstance().signOut() --> retornar tela de login
         }
     }
 
