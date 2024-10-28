@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "235602097701",
+    "project_id": "weather-appbsi",
+    "storage_bucket": "weather-appbsi.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:235602097701:android:6a0b2596c4f57aaeb2b1cc",
+        "android_client_info": {
+          "package_name": "clima.tempo.weather"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDWPfAPBpvOqngxC7tYJotcSkHiAuHWXbc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
