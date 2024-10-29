@@ -50,6 +50,7 @@ class LoginActivity : AppCompatActivity() {
                                 "Não foi possivel encontrar o Usuário",
                                 Snackbar.LENGTH_SHORT
                             )
+
                             snackbar.setBackgroundTint(0xFF00008B.toInt())
                             snackbar.show()
                         }
