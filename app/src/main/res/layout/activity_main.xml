@@ -49,6 +49,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="end"
+                        android:paddingTop="11dp"
                         android:textColor="@color/primary_text_color"
                         android:textSize="@dimen/label_text_size"
                         android:textStyle="bold"
@@ -59,6 +60,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="end"
+                        android:paddingBottom="11dp"
                         android:textColor="@color/secondary_text_color"
                         android:textSize="@dimen/value_text_size"
                         tools:text="Condição" />
@@ -161,6 +163,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="end"
+                        android:paddingTop="11dp"
                         android:textColor="@color/primary_text_color"
                         android:textSize="@dimen/label_text_size"
                         android:textStyle="bold"
@@ -171,6 +174,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="end"
+                        android:paddingBottom="11dp"
                         android:textColor="@color/secondary_text_color"
                         android:textSize="@dimen/value_text_size"
                         tools:text="Máxima" />
