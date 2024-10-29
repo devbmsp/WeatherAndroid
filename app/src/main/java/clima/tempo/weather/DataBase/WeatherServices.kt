@@ -1,6 +1,5 @@
-package clima.tempo.weather.Network
+package clima.tempo.weather.DataBase
 
-import clima.tempo.weather.Models.WeatherResponse
 import retrofit.Call
 import retrofit.http.GET
 import retrofit.http.Query

@@ -1,4 +1,4 @@
-package clima.tempo.weather
+package clima.tempo.weather.Models
 import android.content.Intent
 import android.location.LocationManager
 import android.os.Bundle
@@ -22,11 +22,9 @@ import android.os.Looper
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
-import clima.tempo.weather.Models.WeatherResponse
-import clima.tempo.weather.Network.WeatherServices
+import clima.tempo.weather.DataBase.WeatherServices
 import com.google.android.gms.location.*
 import com.google.gson.Gson
 import retrofit.Call
@@ -37,26 +35,39 @@ import retrofit.*
 import java.text.SimpleDateFormat
 import java.util.*
 import android.widget.ImageView
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat.getSystemService
-import androidx.core.content.ContextCompat.startActivity
-import androidx.core.location.LocationManagerCompat.isLocationEnabled
-import com.google.firebase.Firebase
+import clima.tempo.weather.Network.Constants
+import clima.tempo.weather.DataBase.WeatherResponse
+import clima.tempo.weather.R
+import clima.tempo.weather.databinding.ActivityMainBinding
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.auth
-import com.google.firebase.database.database
-import com.google.firebase.firestore.FirebaseFirestore
 
 class MainActivity : ComponentActivity() {
     private lateinit var mFusedLocationClient: FusedLocationProviderClient
     private var mProgressDialog: Dialog? = null
     private lateinit var mSharedPreferences : SharedPreferences
+    private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
+        binding.btnDeslogar.setOnClickListener{
+            FirebaseAuth.getInstance().signOut()
+            val  backLogin = Intent(this,LoginActivity::class.java)
+            startActivity(backLogin)
 
+        }
+
+    }
+
+    override fun onStart() {
+        super.onStart()
+        val userAtual= FirebaseAuth.getInstance().currentUser
+        if (userAtual != null) {
+            MainActivity()
+        }
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         mSharedPreferences = getSharedPreferences(Constants.PREFERENCE_NAME, Context.MODE_PRIVATE)
         setupUI()
@@ -99,14 +110,14 @@ class MainActivity : ComponentActivity() {
                         setupUI()
                     }
 
-                        override fun onPermissionRationaleShouldBeShown(
-                            permissions: MutableList<PermissionRequest>?,
-                            token: PermissionToken?
-                        ) {
-                            showRationalDialogForPermissions()
-                            }
-                        }).onSameThread()
-                        .check() }
+                    override fun onPermissionRationaleShouldBeShown(
+                        permissions: MutableList<PermissionRequest>?,
+                        token: PermissionToken?
+                    ) {
+                        showRationalDialogForPermissions()
+                    }
+                }).onSameThread()
+                .check() }
 
     }
     @SuppressLint("MissingPermission")
@@ -131,57 +142,14 @@ class MainActivity : ComponentActivity() {
             Log.e("Current Longitude", "$mLongitude")
             getLocationWeatherDetails(mLatitude, mLongitude)
 
-            val auth = FirebaseAuth.getInstance()
-
-            //auth.createUserWithEmailAndPassword("brunomatheuspires@hotmail.com","123445")
-            /* auth.signInWithEmailAndPassword("brunomatheuspires@hotmail.com","123445").addOnCompleteListener{ autenticacao ->
-                         if (autenticacao.isSuccessful){
-                               val usuarioAtual = auth.currentUser
-                               val emailUsuario = usuarioAtual?.email
-
-                               if (emailUsuario != null) {
-                                   // Utilize o email do usuário conforme necessário
-                                   Log.d("FirebaseAuth", "Email do usuário: $emailUsuario")
-                               } else {
-                                   Log.d("FirebaseAuth", "O usuário não possui um email associado.")
-                               }
-
-                              // OU FAÇA COM O BD PARA PUXAR POR NICK
-                              //PARA ESCREVER NO BD
-
-                              val db = FirebaseFirestore.getInstance()
-                              // passe o username (imagine que apertou o botão de cadastrar e teve que registrar)
-                              val userMap = hashMapOf(
-                                  "nickName" to "bruno",
-                                  "email" to "brunomatheuspires@hotmail.com",
-                                  "senha" to "123445"
-                              )
-                              db.collection("Usuários").document("bruno")
-                                  .set(userMap).addOnCompleteListener{
-                                      Log.d("db", "success BD")
-                                  }
+/*
                               //ler o bd :
                               db.collection("Usuários").document("bruno2")
                                   .addSnapshotListener{documento,error ->
                                       print(documento?.getString("nickName"))
 
-
-                                  }
-             }
-            }
             */
 
-
-
-           // override fun onStart() {
-             //   Super.onStart()
-               // val userAtual= FirebaseAuth.getInstance().currentUser
-                //if (userAtual == null) {
-                  //  telaPrincipal()
-                //}
-            //}
-
-            //quando clicar deslogar vai executar :     FirebaseAuth.getInstance().signOut() --> retornar tela de login
         }
     }
 
@@ -330,6 +298,24 @@ class MainActivity : ComponentActivity() {
                 tv_name.text = weatherList.name
                 tv_country.text = weatherList.sys.country
                 // Não tá importando os dados da activity_main.xml
+
+                val iv_min_max: ImageView = findViewById(R.id.iv_min_max)
+                iv_min_max.setImageResource(R.drawable.temperature)
+
+                val iv_humidity: ImageView = findViewById(R.id.iv_humidity)
+                iv_humidity.setImageResource(R.drawable.humidity)
+
+                val iv_wind: ImageView = findViewById(R.id.iv_wind)
+                iv_wind.setImageResource(R.drawable.wind)
+
+                val iv_location: ImageView = findViewById(R.id.iv_location)
+                iv_location.setImageResource(R.drawable.location)
+
+                val iv_sunrise: ImageView = findViewById(R.id.iv_sunrise)
+                iv_sunrise.setImageResource(R.drawable.sunrise)
+
+                val iv_sunset: ImageView = findViewById(R.id.iv_sunset)
+                iv_sunset.setImageResource(R.drawable.sunset)
 
                 val iv_main: ImageView = findViewById(R.id.iv_main)
                 when(weatherList.weather[i].icon){

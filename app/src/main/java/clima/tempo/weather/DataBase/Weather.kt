@@ -1,4 +1,4 @@
-package clima.tempo.weather.Models
+package clima.tempo.weather.DataBase
 
 import java.io.Serializable
 
