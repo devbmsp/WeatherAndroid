@@ -1,4 +1,4 @@
-package clima.tempo.weather.Network
+package clima.tempo.weather.Models
 
 import android.content.Context
 import android.net.ConnectivityManager

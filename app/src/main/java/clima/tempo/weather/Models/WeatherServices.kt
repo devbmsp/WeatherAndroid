@@ -1,4 +1,4 @@
-package clima.tempo.weather.DataBase
+package clima.tempo.weather.Models
 
 import retrofit.Call
 import retrofit.http.GET

@@ -19,11 +19,11 @@
         android:theme="@style/Theme.Weather"
         tools:targetApi="31">
         <activity
-            android:name=".Models.RegisterActivity"
+            android:name=".RegisterActivity"
             android:exported="false"
             android:theme="@style/Theme.Weather" />
         <activity
-            android:name=".Models.LoginActivity"
+            android:name=".View.LoginActivity"
             android:exported="true"
             android:theme="@style/Theme.Weather">
             <intent-filter>
@@ -33,7 +33,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".Models.MainActivity"
+            android:name=".View.MainActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:screenOrientation="portrait"

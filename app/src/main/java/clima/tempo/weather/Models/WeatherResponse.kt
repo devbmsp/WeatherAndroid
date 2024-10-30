@@ -1,4 +1,4 @@
-package clima.tempo.weather.DataBase
+package clima.tempo.weather.Models
 import java.io.Serializable
 data class WeatherResponse (
     val coord: Coord,
