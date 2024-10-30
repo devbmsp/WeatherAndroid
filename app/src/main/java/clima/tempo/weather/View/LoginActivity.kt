@@ -50,7 +50,6 @@ class LoginActivity : AppCompatActivity() {
         viewModel.loginState.observe(this, Observer { state ->
             when (state) {
                 is LoginState.Loading -> {
-                    // Mostrar indicador de carregamento, se necessário
                 }
                 is LoginState.Success -> {
                     val intent = Intent(this, MainActivity::class.java)

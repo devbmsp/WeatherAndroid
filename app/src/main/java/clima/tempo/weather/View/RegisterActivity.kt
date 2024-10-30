@@ -41,7 +41,6 @@ class RegisterActivity : AppCompatActivity() {
         viewModel.registerState.observe(this) { state ->
             when (state) {
                 is RegisterState.Loading -> {
-                    // Mostrar indicador de carregamento, se necessário
                 }
 
                 is RegisterState.Success -> {

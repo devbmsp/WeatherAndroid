@@ -1,23 +1,35 @@
 // MainActivity.kt
 package clima.tempo.weather.View
 
+import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Dialog
+import android.content.ActivityNotFoundException
+import android.content.Context
 import android.content.Intent
+import android.location.LocationManager
+import android.net.Uri
 import android.os.Bundle
+import android.provider.Settings
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import clima.tempo.weather.Models.WeatherResponse
 import clima.tempo.weather.R
 import clima.tempo.weather.ViewModel.MainViewModel
 import clima.tempo.weather.databinding.ActivityMainBinding
+import com.google.android.gms.location.*
 import com.google.firebase.auth.FirebaseAuth
-import android.widget.ImageView
-import android.widget.TextView
-import clima.tempo.weather.Models.Constants
+import com.karumi.dexter.Dexter
+import com.karumi.dexter.MultiplePermissionsReport
+import com.karumi.dexter.PermissionToken
+import com.karumi.dexter.listener.PermissionRequest
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -26,6 +38,10 @@ class MainActivity : ComponentActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var viewModel: MainViewModel
     private var mProgressDialog: Dialog? = null
+    private lateinit var mFusedLocationClient: FusedLocationProviderClient
+
+    private var mLatitude: Double = 0.0
+    private var mLongitude: Double = 0.0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,11 +49,12 @@ class MainActivity : ComponentActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Inicializa a ViewModel
         viewModel = ViewModelProvider(
             this,
             ViewModelProvider.AndroidViewModelFactory.getInstance(application)
         ).get(MainViewModel::class.java)
+
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
         binding.btnDeslogar.setOnClickListener {
             FirebaseAuth.getInstance().signOut()
@@ -54,21 +71,102 @@ class MainActivity : ComponentActivity() {
 
         val userAtual = FirebaseAuth.getInstance().currentUser
         if (userAtual == null) {
-            // Se não estiver logado, volta para a tela de login
             val intent = Intent(this, LoginActivity::class.java)
             startActivity(intent)
             finish()
             return
         }
 
-        // Carrega dados do SharedPreferences
         viewModel.loadWeatherDataFromPrefs()
 
-        // Busca novos dados
-        // Coordenadas de Curitiba
-        val latitude = -25.4284
-        val longitude = -49.2733
-        viewModel.fetchWeatherData(latitude, longitude)
+        if (!isLocationEnabled()) {
+            Toast.makeText(
+                this,
+                "Sua localização está desligada, favor ligue para prosseguir.",
+                Toast.LENGTH_SHORT
+            ).show()
+
+            val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+            startActivity(intent)
+        } else {
+            requestLocationPermission()
+        }
+    }
+
+    private fun requestLocationPermission() {
+        Dexter.withActivity(this)
+            .withPermissions(
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            )
+            .withListener(object : MultiplePermissionsListener {
+                override fun onPermissionsChecked(report: MultiplePermissionsReport) {
+                    if (report.areAllPermissionsGranted()) {
+                        requestLocationData()
+                    }
+
+                    if (report.isAnyPermissionPermanentlyDenied) {
+                        showRationalDialogForPermissions()
+                    }
+                }
+
+                override fun onPermissionRationaleShouldBeShown(
+                    permissions: MutableList<PermissionRequest>,
+                    token: PermissionToken
+                ) {
+                    showRationalDialogForPermissions()
+                }
+            }).check()
+    }
+
+    private fun showRationalDialogForPermissions() {
+        AlertDialog.Builder(this)
+            .setMessage("Parece que você desativou as permissões necessárias. Elas podem ser ativadas nas configurações.")
+            .setPositiveButton(
+                "Vá para as Configurações"
+            ) { _, _ ->
+                try {
+                    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                    val uri = Uri.fromParts("package", packageName, null)
+                    intent.data = uri
+                    startActivity(intent)
+                } catch (e: ActivityNotFoundException) {
+                    e.printStackTrace()
+                }
+            }
+            .setNegativeButton("Cancelar") { dialog, _ ->
+                dialog.dismiss()
+            }.show()
+    }
+
+    private fun isLocationEnabled(): Boolean {
+        val locationManager: LocationManager =
+            getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) ||
+                locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun requestLocationData() {
+        val mLocationRequest = LocationRequest.create()
+        mLocationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+        mFusedLocationClient.requestLocationUpdates(
+            mLocationRequest, mLocationCallback,
+            android.os.Looper.myLooper()
+        )
+    }
+
+    private val mLocationCallback = object : LocationCallback() {
+        override fun onLocationResult(locationResult: LocationResult) {
+            val mLastLocation = locationResult.lastLocation
+            mLatitude = mLastLocation.latitude
+            mLongitude = mLastLocation.longitude
+
+            Log.i("Current Latitude", "$mLatitude")
+            Log.i("Current Longitude", "$mLongitude")
+
+            viewModel.fetchWeatherData(mLatitude, mLongitude)
+        }
     }
 
     private fun setupObservers() {
@@ -101,10 +199,8 @@ class MainActivity : ComponentActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when(item.itemId){
             R.id.action_refresh -> {
-                // Atualiza os dados
-                val latitude = -25.4284
-                val longitude = -49.2733
-                viewModel.fetchWeatherData(latitude, longitude)
+                // Atualiza os dados com as coordenadas atuais
+                viewModel.fetchWeatherData(mLatitude, mLongitude)
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -112,73 +208,41 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun setupUI(weatherList: WeatherResponse) {
-        for (i in weatherList.weather.indices) {
-            val tv_main = findViewById<TextView>(R.id.tv_main)
-            val tv_main_description = findViewById<TextView>(R.id.tv_main_description)
-            val tv_temp = findViewById<TextView>(R.id.tv_temp)
-            val tv_sunrise_time = findViewById<TextView>(R.id.tv_sunrise_time)
-            val tv_sunset_time = findViewById<TextView>(R.id.tv_sunset_time)
-            val tv_humidity = findViewById<TextView>(R.id.tv_humidity)
-            val tv_min = findViewById<TextView>(R.id.tv_min)
-            val tv_max = findViewById<TextView>(R.id.tv_max)
-            val tv_speed = findViewById<TextView>(R.id.tv_speed)
-            val tv_speed_unit = findViewById<TextView>(R.id.tv_speed_unit)
-            val tv_name = findViewById<TextView>(R.id.tv_name)
-            val tv_country = findViewById<TextView>(R.id.tv_country)
+        binding.apply {
+            val weather = weatherList.weather[0]
+            tvMain.text = weather.main
+            tvMainDescription.text = weather.description
+            tvTemp.text = "Temperatura: ${weatherList.main.temp}°C"
+            tvSunriseTime.text = unixTime(weatherList.sys.sunrise.toLong())
+            tvSunsetTime.text = unixTime(weatherList.sys.sunset.toLong())
+            tvHumidity.text = "${weatherList.main.humidity}%"
+            tvMin.text = "${weatherList.main.temp_min} min"
+            tvMax.text = "${weatherList.main.temp_max} max"
+            tvSpeed.text = "Velocidade do Vento:"
+            tvSpeedUnit.text = "${weatherList.wind.speed} Km/H"
+            tvName.text = weatherList.name
+            tvCountry.text = weatherList.sys.country
 
-            tv_main.text = weatherList.weather[i].main
-            tv_main_description.text = weatherList.weather[i].description
-            tv_temp.text = "Temperatura: " + weatherList.main.temp.toString() + getUnit()
-            tv_sunrise_time.text = unixTime(weatherList.sys.sunrise.toLong())
-            tv_sunset_time.text = unixTime(weatherList.sys.sunset.toLong())
-            tv_humidity.text = weatherList.main.humidity.toString() + "%"
-            tv_min.text = weatherList.main.temp_min.toString() + " min"
-            tv_max.text = weatherList.main.temp_max.toString() + " max"
-            tv_speed.text = "Velocidade do Vento:"
-            tv_speed_unit.text = weatherList.wind.speed.toString() + " Km/H"
-            tv_name.text = weatherList.name
-            tv_country.text = weatherList.sys.country
+            ivMinMax.setImageResource(R.drawable.temperature)
+            ivHumidity.setImageResource(R.drawable.humidity)
+            ivWind.setImageResource(R.drawable.wind)
+            ivLocation.setImageResource(R.drawable.location)
+            ivSunrise.setImageResource(R.drawable.sunrise)
+            ivSunset.setImageResource(R.drawable.sunset)
 
-            val iv_min_max: ImageView = findViewById(R.id.iv_min_max)
-            iv_min_max.setImageResource(R.drawable.temperature)
-
-            val iv_humidity: ImageView = findViewById(R.id.iv_humidity)
-            iv_humidity.setImageResource(R.drawable.humidity)
-
-            val iv_wind: ImageView = findViewById(R.id.iv_wind)
-            iv_wind.setImageResource(R.drawable.wind)
-
-            val iv_location: ImageView = findViewById(R.id.iv_location)
-            iv_location.setImageResource(R.drawable.location)
-
-            val iv_sunrise: ImageView = findViewById(R.id.iv_sunrise)
-            iv_sunrise.setImageResource(R.drawable.sunrise)
-
-            val iv_sunset: ImageView = findViewById(R.id.iv_sunset)
-            iv_sunset.setImageResource(R.drawable.sunset)
-
-            val iv_main: ImageView = findViewById(R.id.iv_main)
-            when(weatherList.weather[i].icon){
-                "01d" -> iv_main.setImageResource(R.drawable.sunny)
-                "02d" -> iv_main.setImageResource(R.drawable.cloud)
-                "03d" -> iv_main.setImageResource(R.drawable.cloud)
-                "04d" -> iv_main.setImageResource(R.drawable.cloud)
-                "04n" -> iv_main.setImageResource(R.drawable.cloud)
-                "10d" -> iv_main.setImageResource(R.drawable.rain)
-                "11d" -> iv_main.setImageResource(R.drawable.storm)
-                "13d" -> iv_main.setImageResource(R.drawable.snowflake)
-                "01n" -> iv_main.setImageResource(R.drawable.cloud)
-                "02n" -> iv_main.setImageResource(R.drawable.cloud)
-                "03n" -> iv_main.setImageResource(R.drawable.cloud)
-                "10n" -> iv_main.setImageResource(R.drawable.cloud)
-                "11n" -> iv_main.setImageResource(R.drawable.rain)
-                "13n" -> iv_main.setImageResource(R.drawable.snowflake)
+            when(weather.icon){
+                "01d" -> ivMain.setImageResource(R.drawable.sunny)
+                "02d", "03d", "04d", "04n" -> ivMain.setImageResource(R.drawable.cloud)
+                "10d" -> ivMain.setImageResource(R.drawable.rain)
+                "11d" -> ivMain.setImageResource(R.drawable.storm)
+                "13d" -> ivMain.setImageResource(R.drawable.snowflake)
+                "01n" -> ivMain.setImageResource(R.drawable.cloud)
+                "02n", "03n" -> ivMain.setImageResource(R.drawable.cloud)
+                "10n" -> ivMain.setImageResource(R.drawable.cloud)
+                "11n" -> ivMain.setImageResource(R.drawable.rain)
+                "13n" -> ivMain.setImageResource(R.drawable.snowflake)
             }
         }
-    }
-
-    private fun getUnit(): String {
-        return "°C"
     }
 
     private fun unixTime(timex: Long): String {
@@ -189,14 +253,22 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun showCustomProgressDialog(){
-        mProgressDialog = Dialog(this)
-        mProgressDialog!!.setContentView(R.layout.dialog_custom_progress)
+        if (mProgressDialog == null) {
+            mProgressDialog = Dialog(this)
+            mProgressDialog!!.setContentView(R.layout.dialog_custom_progress)
+            mProgressDialog!!.setCancelable(false)
+        }
         mProgressDialog!!.show()
     }
 
     private fun hideProgressDialog() {
-        if (mProgressDialog != null){
+        if (mProgressDialog != null && mProgressDialog!!.isShowing) {
             mProgressDialog!!.dismiss()
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        mFusedLocationClient.removeLocationUpdates(mLocationCallback)
     }
 }
